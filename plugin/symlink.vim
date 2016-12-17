@@ -1,4 +1,9 @@
-function! s:Symlink_OnBufReadPost(...)
+if exists('g:symlink_loaded')
+  finish
+endif
+let g:symlink_loaded = 1
+
+function! s:symlink_on_buf_read_post(...)
   let l:filename = (a:0 > 0) ? a:1 : expand('%')
   if !filereadable(l:filename)
     return
@@ -13,7 +18,7 @@ function! s:Symlink_OnBufReadPost(...)
   redraw
 endfunction
 
-augroup Symlink
+augroup symlink_plugin
   autocmd!
-  autocmd BufReadPost * nested call <SID>Symlink_OnBufReadPost(expand('<afile>'))
+  autocmd BufReadPost * nested call <SID>symlink_on_buf_read_post(expand('<afile>'))
 augroup END
