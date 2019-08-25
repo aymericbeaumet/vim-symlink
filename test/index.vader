@@ -1,0 +1,9 @@
+# Make all paths relative to this directory
+Before:
+  execute 'cd '. fnamemodify(g:vader_file, ':p:h')
+
+# It should follow symlinks
+Execute:
+  edit! fixture/a/link
+Then:
+  AssertEqual 'fixture/b/file', expand('%:.')
