@@ -28,9 +28,10 @@ Plug 'aymericbeaumet/vim-symlink'
 ```
 
 There is an optional dependency to
-[vim-bbye](https://github.com/moll/vim-bbye), which is used to consistenly
-wipe buffers without impacting the windows order. A fallback implementation
-is present in vim-symlink, the one in vim-bbye is more robust.
+[vim-bbye](https://github.com/moll/vim-bbye). This plugin allows to
+consistenly wipe buffers without impacting the windows order. Even though a
+failover is present in vim-symlink, the vim-bbye implementation is more
+robust.
 
 ## Usage
 
