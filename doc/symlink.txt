@@ -10,39 +10,10 @@ License: MIT
 cross-platform way. This means that when you edit a pathname that is a
 symlink, vim will instead open the file using the resolved target path.
 
-It will behave as expected even when facing edge-cases like:
-
-- when running vim in diff mode
-- when creating a new file in a symlinked directory
-
                             {1}: https://github.com/aymericbeaumet/vim-symlink
 
 ==============================================================================
-2. Rationale                                                 *symlink-rationale*
-
-For example, if you keep your configuration files such as .bashrc in a Git
-repository and symlink ~/.bashrc to ~/dotfiles/.bashrc, plugins like
-vim-fugitive will not realize the file is under version control as there's no
-~/.git. But if you use this plugin, vim ~/.bashrc will edit ~/dotfiles/.bashrc
-instead, and vim-fugitive will behave appropriately.
-
-==============================================================================
-3. Install                                                     *symlink-install*
-
-I recommend using {vim-plug}{2}:
->
-    Plug 'moll/vim-bbye' " optional dependency
-    Plug 'aymericbeaumet/vim-symlink'
-<
-
-Note the optional dependency to vim-bbye: it is used to consistenly wipeout
-buffers without impacting the windows order. A fallback implementation is
-present, but vim-bbye is more robust.
-
-                                      {2} https://github.com/junegunn/vim-plug
-
-==============================================================================
-4. Configuration                                         *symlink-configuration*
+2. Configuration                                         *symlink-configuration*
 
 You can configure this plugin through the following global variables.
 
