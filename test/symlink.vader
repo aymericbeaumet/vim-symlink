@@ -1,0 +1,31 @@
+" Make all paths in the tests relative to this directory
+Before:
+  execute 'cd '. fnameescape(fnamemodify(g:vader_file, ':p:h'))
+
+" It should support editing normal files
+Execute (edit an existing normal file):
+  edit! fixture/foo
+Then (assert that the path/content are as expected):
+  AssertEqual 'fixture/foo', expand('%:.')
+  AssertEqual ['foo'], getline(1, '$')
+
+" It should support editing a new file in a normal directory
+Execute (edit a newfile in a normal directory):
+  edit! fixture/dir/newfile
+Then (assert that the path/content are as expected):
+  AssertEqual 'fixture/dir/newfile', expand('%:.')
+  AssertEqual [''], getline(1, '$')
+
+" It should support editing symlinked files
+Execute (edit an existing symlinked file):
+  edit! fixture/foo.link
+Then (assert that the path/content are as expected):
+  AssertEqual 'fixture/foo', expand('%:.')
+  AssertEqual ['foo'], getline(1, '$')
+
+" It should support editing a new file in a symlinked directory
+Execute (edit a newfile in a symlinked directory):
+  edit! fixture/dir.link/newfile
+Then (assert that the path/content are as expected):
+  AssertEqual 'fixture/dir/newfile', expand('%:.')
+  AssertEqual [''], getline(1, '$')

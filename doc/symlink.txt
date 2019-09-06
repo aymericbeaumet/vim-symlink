@@ -1,49 +1,19 @@
-*symlink.txt* Automagically follow symlinks
+*symlink.txt*  Automagically follow symlinks
 
 Author:  Aymeric Beaumet <hi@aymericbeaumet.com> (https://aymericbeaumet.com)
-License: Public Domain
-
-==============================================================================
-Help on symlink.vim                                               *symlink-help*
-
-    1. Introduction ............... |symlink-introduction|
-    2. Rationale .................. |symlink-rationale|
-    3. Installation ............... |symlink-install|
-    4. Configuration .............. |symlink-configuration|
-    5. FAQ ........................ |symlink-faq|
-    6. Bugs ....................... |symlink-bugs|
-    7. Contributing ............... |symlink-contributing|
-    8. License .................... |symlink-license|
+License: MIT
 
 ==============================================================================
 1. Introduction                                           *symlink-introduction*
 
-{symlink.vim}{1} enables to automatically follow the symlinks in Vim in a
-cross-platform way. This means that if you edit a pathname that is a symlink,
-vim will instead open the file using the resolved target path.
+{vim-symlink}{1} enables to automatically follow the symlinks in Vim in a
+cross-platform way. This means that when you edit a pathname that is a
+symlink, vim will instead open the file using the resolved target path.
 
-                            {1}: https://github.com/aymericbeaumet/symlink.vim
-
-==============================================================================
-2. Rationale                                                 *symlink-rationale*
-
-For example, if you keep your configuration files such as .bashrc in a Git
-repository and symlink ~/.bashrc -> ~/dotfiles/.bashrc, plugins like
-vim-fugitive will not realize the file is under version control as there's no
-~/.git. But if you use this plugin, vim ~/.bashrc will edit ~/dotfiles/.bashrc
-instead, and you will be able to use vim-fugitive.
+                            {1}: https://github.com/aymericbeaumet/vim-symlink
 
 ==============================================================================
-3. Installation                                                *symlink-install*
-
-Using {vim-plug}{2}:
->
-    Plug 'aymericbeaumet/symlink.vim'
-<
-                                      {2} https://github.com/junegunn/vim-plug
-
-==============================================================================
-4. Configuration                                         *symlink-configuration*
+2. Configuration                                         *symlink-configuration*
 
 You can configure this plugin through the following global variables.
 
@@ -54,33 +24,16 @@ If set, turn off the script.
 >
     let g:symlink_loaded = 1
 <
-==============================================================================
-5. FAQ                                                             *symlink-faq*
 
-==============================================================================
-6. Bugs                                                           *symlink-bugs*
+------------------------------------------------------------------------------
+*g:symlink_redraw*
 
-If you find a bug please post it on the issue {tracker}{3}.
-
-                      {3} https://github.com/aymericbeaumet/symlink.vim/issues
-
-==============================================================================
-7. Contributing                                           *symlink-contributing*
-
-Think you can make this plugin better? Awesome! Fork it on {GitHub}{4} and
-send a pull request.
-
-                             {4} https://github.com/aymericbeaumet/symlink.vim
-
-==============================================================================
-8. License                                                     *symlink-license*
-
-Public Domain - {CC0}{5}
-
-To the extent possible under law, Aymeric Beaumet has waived all copyright and
-related or neighboring rights to this work.
-
-                          {5} http://creativecommons.org/publicdomain/zero/1.0
+By default vim-symlink will make sure to redraw the screen after a symlink
+has been followed. This can cause the screen to flicker. To prevent this, set
+this option to 0:
+>
+    let g:symlink_redraw = 0
+<
 
 ==============================================================================
  vim:tw=78:ft=help

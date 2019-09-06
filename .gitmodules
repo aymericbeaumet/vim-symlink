@@ -1,0 +1,9 @@
+[submodule "test/vader.vim"]
+	path = test/vader.vim
+	url = https://github.com/junegunn/vader.vim.git
+[submodule "test/vint"]
+	path = test/vint
+	url = https://github.com/Kuniwak/vint.git
+[submodule "test/vim-bbye"]
+	path = test/vim-bbye
+	url = https://github.com/moll/vim-bbye.git
