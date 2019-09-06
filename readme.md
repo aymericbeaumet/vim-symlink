@@ -32,7 +32,8 @@ Plug 'aymericbeaumet/vim-symlink'
 ```
 
 Note the optional dependency to [vim-bbye](https://github.com/moll/vim-bbye):
-it is used to consistenly wipeout buffers without impacting the windows order.
+it is used to consistenly wipeout buffers without impacting the windows
+order. A fallback implementation is implemented, but vim-bbye is more robust.
 
 ## Usage
 

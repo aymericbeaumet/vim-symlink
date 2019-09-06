@@ -35,8 +35,9 @@ I recommend using {vim-plug}{2}:
     Plug 'aymericbeaumet/vim-symlink'
 <
 
-Note the optional dependency to vim-bbye: it is used to consistenly
-wipeout buffers without impacting the windows order.
+Note the optional dependency to vim-bbye: it is used to consistenly wipeout
+buffers without impacting the windows order. A fallback implementation is
+implemented, but vim-bbye is more robust.
 
                                       {2} https://github.com/junegunn/vim-plug
 
