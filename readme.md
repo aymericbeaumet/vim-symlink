@@ -17,25 +17,23 @@ It will behave as expected even when facing edge-cases like:
 
 For example, if you keep your configuration files such as _.bashrc_ in a Git
 repository and symlink _~/.bashrc_ to _~/dotfiles/.bashrc_, plugins like
-[vim-fugitive](https://github.com/tpope/vim-fugitive) will not realize the file
-is under version control as there's no _~/.git_. But if you use this plugin,
-`vim ~/.bashrc` will edit _~/dotfiles/.bashrc_ instead, and you will be able to
-use vim-fugitive.
+[vim-fugitive](https://github.com/tpope/vim-fugitive) will not realize the
+file is under version control as there's no _~/.git_. But if you use this
+plugin, `vim ~/.bashrc` will edit _~/dotfiles/.bashrc_ instead, and
+vim-fugitive will behave appropriately.
 
 ## Install
 
 I recommend using [vim-plug](https://github.com/junegunn/vim-plug):
 
 ```vim
-Plug 'moll/vim-bbye' " optional dependency
+Plug 'moll/vim-bbye' " recommended dependency
 Plug 'aymericbeaumet/vim-symlink'
 ```
 
-Note the optional dependency to [vim-bbye](https://github.com/moll/vim-bbye),
-which allows to cleanly handle some edge-cases. If you choose not to install
-it, you will be notified if some actions cannot be performed.
+Note the optional dependency to [vim-bbye](https://github.com/moll/vim-bbye):
+it is used to consistenly wipeout buffers without impacting the windows order.
 
 ## Usage
 
-Discover the usage and the configuration of this plugin in [the
-documentation](./doc/symlink.txt).
+Read more about the usage in [the documentation](./doc/symlink.txt).
