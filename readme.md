@@ -27,7 +27,7 @@ vim-fugitive will behave appropriately.
 I recommend using [vim-plug](https://github.com/junegunn/vim-plug):
 
 ```vim
-Plug 'moll/vim-bbye' " recommended dependency
+Plug 'moll/vim-bbye' " optional dependency
 Plug 'aymericbeaumet/vim-symlink'
 ```
 

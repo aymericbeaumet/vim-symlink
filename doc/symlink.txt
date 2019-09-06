@@ -31,11 +31,11 @@ instead, and vim-fugitive will behave appropriately.
 
 I recommend using {vim-plug}{2}:
 >
-    Plug 'moll/vim-bbye' " recommended dependency
+    Plug 'moll/vim-bbye' " optional dependency
     Plug 'aymericbeaumet/vim-symlink'
 <
 
-Note the recommended dependency to vim-bbye: it is used to consistenly
+Note the optional dependency to vim-bbye: it is used to consistenly
 wipeout buffers without impacting the windows order.
 
                                       {2} https://github.com/junegunn/vim-plug
