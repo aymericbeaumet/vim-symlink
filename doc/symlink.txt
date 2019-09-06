@@ -1,0 +1,68 @@
+*symlink.txt*  Automagically follow symlinks
+
+Author:  Aymeric Beaumet <hi@aymericbeaumet.com> (https://aymericbeaumet.com)
+License: MIT
+
+==============================================================================
+1. Introduction                                           *symlink-introduction*
+
+{vim-symlink}{1} enables to automatically follow the symlinks in Vim in a
+cross-platform way. This means that when you edit a pathname that is a
+symlink, vim will instead open the file using the resolved target path.
+
+It will behave as expected even when facing edge-cases like:
+
+- when running vim in diff mode
+- when creating a new file in a symlinked directory
+
+                            {1}: https://github.com/aymericbeaumet/vim-symlink
+
+==============================================================================
+2. Rationale                                                 *symlink-rationale*
+
+For example, if you keep your configuration files such as .bashrc in a Git
+repository and symlink ~/.bashrc to ~/dotfiles/.bashrc, plugins like
+vim-fugitive will not realize the file is under version control as there's no
+~/.git. But if you use this plugin, vim ~/.bashrc will edit ~/dotfiles/.bashrc
+instead, and you will be able to use vim-fugitive.
+
+==============================================================================
+3. Install                                                     *symlink-install*
+
+I recommend using {vim-plug}{2}:
+>
+    Plug 'moll/vim-bbye' " optional dependency
+    Plug 'aymericbeaumet/vim-symlink'
+<
+
+Note the optional dependency to vim-bbye, which allows to cleanly handle some
+edge-cases. If you choose not to install it, you will be notified if some
+actions cannot be performed.
+
+                                      {2} https://github.com/junegunn/vim-plug
+
+==============================================================================
+4. Configuration                                         *symlink-configuration*
+
+You can configure this plugin through the following global variables.
+
+------------------------------------------------------------------------------
+*g:symlink_loaded*
+
+If set, turn off the script.
+>
+    let g:symlink_loaded = 1
+<
+
+------------------------------------------------------------------------------
+*g:symlink_redraw*
+
+By default vim-symlink will make sure to redraw the screen after a symlink
+has been followed. This can cause the screen to flicker. To prevent this, set
+this option to 0:
+>
+    let g:symlink_redraw = 0
+<
+
+==============================================================================
+ vim:tw=78:ft=help

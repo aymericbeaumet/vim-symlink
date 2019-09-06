@@ -3,22 +3,37 @@ if exists('g:symlink_loaded')
 endif
 let g:symlink_loaded = 1
 
-function! s:symlink_on_buf_read_post(...)
-  let l:filename = (a:0 > 0) ? a:1 : expand('%')
-  if !filereadable(l:filename)
+let g:symlink_redraw = get(g:,'symlink_redraw', 1)
+
+function! s:on_buf_read(filepath)
+  if !filereadable(a:filepath)
     return
   endif
-  let l:resolved = resolve(l:filename)
-  if l:resolved ==# l:filename
+
+  let l:resolved = resolve(a:filepath)
+  if l:resolved ==# a:filepath
     return
   endif
-  enew
-  bwipeout #
-  exec 'edit ' . fnameescape(l:resolved)
-  redraw
+
+  if exists(':Bwipeout') " vim-bbye
+    Bwipeout
+  else
+    if &diff
+      echoerr "symlink.vim: 'moll/vim-bbye' is required in order for this plugin to properly work in diff mode"
+      return
+    endif
+    enew
+    bwipeout #
+  endif
+
+  execute 'edit ' . fnameescape(l:resolved)
+
+  if g:symlink_redraw
+    redraw
+  endif
 endfunction
 
 augroup symlink_plugin
   autocmd!
-  autocmd BufReadPost * nested call <SID>symlink_on_buf_read_post(expand('<afile>'))
+  autocmd BufRead * nested call s:on_buf_read(expand('<afile>'))
 augroup END

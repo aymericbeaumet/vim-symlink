@@ -1,0 +1,18 @@
+" Make all paths in the tests relative to this directory
+Before:
+  execute 'cd '. fnameescape(fnamemodify(g:vader_file, ':p:h'))
+
+" It should follow the symlinks for every file
+Execute (skip the 2 Vader.vim buffers):
+  execute "normal \<C-W>q"
+  execute "normal \<C-W>q"
+Then (assert that the windows are in the right order with the right content):
+  AssertEqual 1, tabpagenr('$')
+  execute "normal 1gt"
+  AssertEqual 2, winnr('$')
+  execute "normal 1\<C-W>\<C-W>"
+  AssertEqual 'fixture/bar', expand('%:.')
+  AssertEqual ['bar'], getline(1, '$')
+  execute "normal \<C-W>l"
+  AssertEqual 'fixture/foo', expand('%:.')
+  AssertEqual ['foo'], getline(1, '$')

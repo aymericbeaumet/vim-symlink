@@ -4,3 +4,6 @@
 [submodule "test/vint"]
 	path = test/vint
 	url = https://github.com/Kuniwak/vint.git
+[submodule "test/vim-bbye"]
+	path = test/vim-bbye
+	url = https://github.com/moll/vim-bbye.git
