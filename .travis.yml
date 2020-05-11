@@ -1,4 +1,8 @@
-os:
-  - linux
-  - osx
-language: minimal
+jobs:
+  include:
+    - os: linux
+      language: python
+    - os: osx
+      language: minimal
+install: make install
+script: make test

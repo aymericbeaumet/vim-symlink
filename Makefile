@@ -2,7 +2,7 @@ PIP ?= pip3
 VIM ?= vim
 VINT ?= vint
 
-all: install test
+all: install
 
 install:
 	$(PIP) install vim-vint==0.3.21
