@@ -1,9 +1,16 @@
+PIP ?= pip3
 VIM ?= vim
-VINT ?= python3 test/vint/bin/vint
+VINT ?= vint
 
-all: test
+all: install test
+
+install:
+	$(PIP) install vim-vint==0.3.21
 
 test: vint vader
+
+vint:
+	$(VINT) plugin
 
 vader:
 	cd test && $(VIM) -NEsu vimrc                                      -c 'Vader! symlink.vader'
@@ -12,7 +19,4 @@ vader:
 	cd test && $(VIM) -NEsu vimrc -O fixture/foo.link fixture/bar.link -c 'Vader! symlink-split-vertical.vader'
 	cd test && $(VIM) -NEsu vimrc -d fixture/foo.link fixture/bar.link -c 'Vader! symlink-split-vertical.vader'
 
-vint:
-	$(VINT) plugin
-
-.PHONY: all test vader vint
+.PHONY: all install test vint vader
