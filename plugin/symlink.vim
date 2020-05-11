@@ -6,14 +6,17 @@ let g:symlink_loaded = 1
 let g:symlink_redraw = get(g:,'symlink_redraw', 1)
 
 function! s:on_buf_read(filepath)
-  if !filereadable(a:filepath)
-    return
-  endif
-
-  let l:resolved = resolve(a:filepath)
-  if l:resolved ==# a:filepath
-    return
-  endif
+  let l:resolved = a:filepath
+  while 1
+    let l:next = resolve(expand(l:resolved))
+    if !filereadable(l:next) || l:next ==# a:filepath
+      return
+    endif
+    if l:next ==# l:resolved
+      break
+    endif
+    let l:resolved = l:next
+  endwhile
 
   if exists(':Bwipeout') " vim-bbye
     Bwipeout
