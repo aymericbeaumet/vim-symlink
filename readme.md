@@ -1,7 +1,4 @@
-# vim-symlink
-
-[![travis](https://img.shields.io/travis/aymericbeaumet/vim-symlink?style=flat-square&logo=travis)](https://travis-ci.org/aymericbeaumet/vim-symlink)
-[![github](https://img.shields.io/github/issues/aymericbeaumet/vim-symlink?style=flat-square&logo=github)](https://github.com/aymericbeaumet/vim-symlink/issues)
+# vim-symlink [![travis](https://img.shields.io/travis/aymericbeaumet/vim-symlink?style=flat-square&logo=travis)](https://travis-ci.org/aymericbeaumet/vim-symlink)
 
 [vim-symlink](https://github.com/aymericbeaumet/vim-symlink) enables to
 automatically follow the symlinks in Vim. This means that when you edit a
