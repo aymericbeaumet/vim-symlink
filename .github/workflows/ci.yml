@@ -1,0 +1,24 @@
+on: [push, pull_request]
+
+name: ci
+
+jobs:
+  ci:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macOS-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install
+        run: make install
+
+      - name: lint
+        run: make lint
+
+      - name: test
+        run: make test
