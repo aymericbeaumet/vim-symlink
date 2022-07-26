@@ -18,11 +18,17 @@ target path.
 
 ## Install
 
-I recommend using [vim-plug](https://github.com/junegunn/vim-plug):
+Install with [packer](https://github.com/wbthomason/packer.nvim):
+
+```lua
+use { 'aymericbeaumet/vim-symlink', requires = { 'moll/vim-bbye' } }
+```
+
+Install with [vim-plug](https://github.com/junegunn/vim-plug):
 
 ```vim
-Plug 'moll/vim-bbye' " optional dependency
 Plug 'aymericbeaumet/vim-symlink'
+Plug 'moll/vim-bbye' " optional dependency
 ```
 
 _[vim-bbye](https://github.com/moll/vim-bbye) allows to consistenly wipe
