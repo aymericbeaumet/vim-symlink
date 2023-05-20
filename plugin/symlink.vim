@@ -35,5 +35,5 @@ endfunction
 
 augroup symlink_plugin
   autocmd!
-  autocmd BufRead * nested call s:on_buf_read(expand('<afile>'))
+  autocmd BufEnter * nested call s:on_buf_read(expand('<afile>'))
 augroup END
