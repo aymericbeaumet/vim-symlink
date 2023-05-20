@@ -24,6 +24,12 @@ Install with [packer](https://github.com/wbthomason/packer.nvim):
 use { 'aymericbeaumet/vim-symlink', requires = { 'moll/vim-bbye' } }
 ```
 
+Install with [lazy.nvim](https://github.com/folke/lazy.nvim):
+
+```lua
+{ "aymericbeaumet/vim-symlink", dependencies = { "moll/vim-bbye" } }
+```
+
 Install with [vim-plug](https://github.com/junegunn/vim-plug):
 
 ```vim
