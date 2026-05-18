@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: install
         run: make install
@@ -20,5 +20,13 @@ jobs:
       - name: lint
         run: make lint
 
-      - name: test
-        run: make test
+      - name: test-vim
+        run: make test-vim
+
+      - name: install neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+
+      - name: test-nvim
+        run: make test-nvim

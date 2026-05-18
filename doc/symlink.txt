@@ -6,9 +6,13 @@ License: MIT
 ==============================================================================
 1. Introduction                                           *symlink-introduction*
 
-{vim-symlink}{1} enables to automatically follow the symlinks in Vim in a
-cross-platform way. This means that when you edit a pathname that is a
-symlink, vim will instead open the file using the resolved target path.
+{vim-symlink}{1} enables to automatically follow the symlinks in Vim and
+Neovim in a cross-platform way. This means that when you edit a pathname that
+is a symlink, vim will instead open the file using the resolved target path.
+
+In Neovim (0.7+), a native Lua implementation is used for better performance.
+In Vim, an equivalent VimScript implementation is used. Both implementations
+share the same features and behavior.
 
                             {1}: https://github.com/aymericbeaumet/vim-symlink
 
@@ -26,6 +30,15 @@ If set, turn off the script.
 <
 
 ------------------------------------------------------------------------------
+*g:symlink_enabled*
+
+Allows to enable/disable symlink resolution at runtime. Set to 0 to
+temporarily disable the plugin without unloading it:
+>
+    let g:symlink_enabled = 0
+<
+
+------------------------------------------------------------------------------
 *g:symlink_redraw*
 
 By default vim-symlink will make sure to redraw the screen after a symlink
@@ -33,6 +46,14 @@ has been followed. This can cause the screen to flicker. To prevent this, set
 this option to 0:
 >
     let g:symlink_redraw = 0
+<
+
+==============================================================================
+3. Events                                                     *symlink-events*
+
+vim-symlink fires a |User| autocommand after resolving a symlink:
+>
+    autocmd User SymlinkResolve echomsg "Symlink resolved!"
 <
 
 ==============================================================================

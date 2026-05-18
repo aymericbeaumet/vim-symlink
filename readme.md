@@ -15,26 +15,40 @@ resolved target path.
 - Allow to create new files in symlinked directories
 - Make [vim-fugitive](https://github.com/tpope/vim-fugitive) behave properly
   with linked files
+- Native Lua implementation for Neovim (0.7+) with VimScript fallback for Vim
+- No dependencies required
+- Runtime enable/disable via `g:symlink_enabled`
+- `User SymlinkResolve` event for custom hooks
 
 ## Install
+
+Install with [lazy.nvim](https://github.com/folke/lazy.nvim):
+
+```lua
+{ 'aymericbeaumet/vim-symlink' }
+```
 
 Install with [packer](https://github.com/wbthomason/packer.nvim):
 
 ```lua
-use { 'aymericbeaumet/vim-symlink', requires = { 'moll/vim-bbye' } }
+use { 'aymericbeaumet/vim-symlink' }
 ```
 
 Install with [vim-plug](https://github.com/junegunn/vim-plug):
 
 ```vim
 Plug 'aymericbeaumet/vim-symlink'
-Plug 'moll/vim-bbye' " optional dependency
 ```
 
-_Note: [vim-bbye](https://github.com/moll/vim-bbye) allows to consistenly wipe
-buffers without impacting the windows order. Even though a fallback is present
-in vim-symlink (hence avoiding a required dependency), the vim-bbye
-implementation is more robust and I advise you to leverage it._
+## Configuration
+
+```vim
+" Disable symlink resolution (default: 1)
+let g:symlink_enabled = 0
+
+" Disable redraw after resolution (default: 1)
+let g:symlink_redraw = 0
+```
 
 ## Usage
 
