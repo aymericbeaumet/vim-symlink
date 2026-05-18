@@ -1,0 +1,153 @@
+" Make all paths in the tests relative to this directory
+Before:
+  execute 'cd '. fnameescape(fnamemodify(g:vader_file, ':p:h'))
+
+" ------- Chained symlinks -------
+
+Execute (edit a chained symlink: chain.link -> foo.link -> foo):
+  edit! fixture/chain.link
+Then (should resolve to the final real file):
+  AssertEqual 'fixture/foo', expand('%:.')
+  AssertEqual ['foo'], getline(1, '$')
+
+" ------- Broken symlink -------
+
+Execute (edit a broken symlink pointing to nonexistent target):
+  edit! fixture/broken.link
+Then (should not crash, buffer should exist):
+  Assert bufnr('%') > 0, 'buffer should exist'
+
+" ------- Filename with spaces -------
+
+Execute (edit a symlink with spaces in the filename):
+  execute 'edit! fixture/space\ file.link'
+Then (should resolve to the real file):
+  AssertEqual 'fixture/foo', expand('%:.')
+  AssertEqual ['foo'], getline(1, '$')
+
+" ------- Multiple symlinks to same target -------
+
+Execute (edit two different symlinks to the same file sequentially):
+  edit! fixture/foo.link
+  edit! fixture/foo2.link
+Then (both should resolve to the same real file):
+  AssertEqual 'fixture/foo', expand('%:.')
+  AssertEqual ['foo'], getline(1, '$')
+
+" ------- Relative symlink in subdirectory -------
+
+Execute (edit a symlink in a subdir pointing to parent dir):
+  edit! fixture/subdir/parent.link
+Then (should resolve to the real file):
+  AssertEqual 'fixture/foo', expand('%:.')
+  AssertEqual ['foo'], getline(1, '$')
+
+" ------- Special characters in filename -------
+
+Execute (edit a symlink with special characters in the name):
+  execute "edit! fixture/special!@\\#.link"
+Then (should resolve to the real file):
+  AssertEqual 'fixture/foo', expand('%:.')
+  AssertEqual ['foo'], getline(1, '$')
+
+" ------- Disabled plugin -------
+
+Execute (symlinks should not be resolved when disabled):
+  let g:symlink_enabled = 0
+  edit! fixture/bar.link
+Then (path should remain as the symlink, not the target):
+  let g:test_path = expand('%:.')
+  Assert g:test_path =~# 'bar\.link', 'expected symlink path, got: ' . g:test_path
+  let g:symlink_enabled = 1
+
+" ------- Re-enable after disable -------
+
+Execute (symlinks should be resolved again after re-enabling):
+  let g:symlink_enabled = 0
+  new
+  execute 'edit! fixture/chain.link'
+  let g:disabled_path = expand('%:.')
+  close
+  let g:symlink_enabled = 1
+  edit! fixture/chain.link
+Then (the re-enabled edit should resolve):
+  AssertEqual 'fixture/foo', expand('%:.')
+  AssertEqual ['foo'], getline(1, '$')
+
+" ------- Open real file then open symlink to it -------
+
+Execute (open real file first, then open symlink to same file):
+  edit! fixture/foo
+  let g:real_buf = bufnr('%')
+  edit! fixture/foo.link
+Then (should resolve to the real path):
+  AssertEqual 'fixture/foo', expand('%:.')
+  AssertEqual ['foo'], getline(1, '$')
+
+" ------- Open symlink then open real file -------
+
+Execute (open symlink first, then open real file directly):
+  edit! fixture/bar.link
+  let g:resolved_path = expand('%:.')
+  edit! fixture/bar
+Then (both should show the real path):
+  AssertEqual 'fixture/bar', expand('%:.')
+  AssertEqual ['bar'], getline(1, '$')
+
+" ------- SymlinkResolve user event fires -------
+" Uses baz.link which is not opened by any other test
+
+Execute (the SymlinkResolve user event should fire on resolution):
+  let g:symlink_resolve_fired = 0
+  augroup test_symlink_resolve
+    autocmd!
+    autocmd User SymlinkResolve let g:symlink_resolve_fired = 1
+  augroup END
+  edit! fixture/baz.link
+Then (the event should have fired):
+  AssertEqual 1, g:symlink_resolve_fired, 'SymlinkResolve should fire when resolving a symlink'
+  augroup test_symlink_resolve
+    autocmd!
+  augroup END
+
+" ------- SymlinkResolve does NOT fire for non-symlinks -------
+
+Execute (the SymlinkResolve event should NOT fire for a regular file):
+  let g:symlink_resolve_fired = 0
+  augroup test_symlink_resolve2
+    autocmd!
+    autocmd User SymlinkResolve let g:symlink_resolve_fired = 1
+  augroup END
+  edit! fixture/bar
+Then (the event should NOT have fired):
+  AssertEqual 0, g:symlink_resolve_fired, 'SymlinkResolve should not fire for regular files'
+  augroup test_symlink_resolve2
+    autocmd!
+  augroup END
+
+" ------- Non-file buffers are skipped -------
+
+Execute (special buftype buffers should not trigger resolution):
+  new
+  setlocal buftype=nofile
+  file symlink_test_nofile_buf
+Then (should not crash with nofile buftype):
+  AssertEqual 'nofile', &buftype
+  close!
+
+" ------- Symlinked directory with existing file -------
+
+Execute (edit an existing file through a symlinked directory):
+  edit! fixture/dir.link/.gitkeep
+Then (should resolve to the real directory path):
+  AssertEqual 'fixture/dir/.gitkeep', expand('%:.')
+
+" ------- Redraw disabled -------
+
+Execute (g:symlink_redraw = 0 should still resolve but not crash):
+  let g:symlink_redraw = 0
+  edit! fixture/foo.link
+Then (should still resolve the symlink):
+  AssertEqual 'fixture/foo', expand('%:.')
+  AssertEqual ['foo'], getline(1, '$')
+  let g:symlink_redraw = 1
