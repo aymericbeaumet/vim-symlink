@@ -7,9 +7,12 @@ let g:symlink_redraw = get(g:, 'symlink_redraw', 1)
 let g:symlink_enabled = get(g:, 'symlink_enabled', 1)
 
 if has('nvim-0.7')
+  let g:symlink_implementation = 'lua'
   lua require('symlink').setup()
   finish
 endif
+
+let g:symlink_implementation = 'vim'
 
 let s:resolving = 0
 

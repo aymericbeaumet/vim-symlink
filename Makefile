@@ -1,15 +1,9 @@
-PIP ?= pip3
 VIM ?= vim
 NVIM ?= nvim
 VINT ?= vint
 
 .PHONY: all
-all: install lint test
-
-.PHONY: install
-install:
-	git submodule update --init
-	$(PIP) install vim-vint==0.3.21
+all: lint test
 
 .PHONY: lint
 lint:

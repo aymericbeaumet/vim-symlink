@@ -13,20 +13,31 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-      - name: install
-        run: make install
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: install vim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: false
+
+      - name: install neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+
+      - name: install linter
+        run: pip install vim-vint==0.3.21
 
       - name: lint
         run: make lint
 
       - name: test-vim
         run: make test-vim
-
-      - name: install neovim
-        uses: rhysd/action-setup-vim@v1
-        with:
-          neovim: true
 
       - name: test-nvim
         run: make test-nvim
