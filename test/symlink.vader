@@ -2,6 +2,16 @@
 Before:
   execute 'cd '. fnameescape(fnamemodify(g:vader_file, ':p:h'))
 
+" It should load the correct implementation
+Execute (check implementation loaded):
+  Assert exists('g:symlink_loaded'), 'g:symlink_loaded should be set'
+  Assert exists('g:symlink_implementation'), 'g:symlink_implementation should be set'
+  if has('nvim-0.7')
+    AssertEqual 'lua', g:symlink_implementation
+  else
+    AssertEqual 'vim', g:symlink_implementation
+  endif
+
 " It should support editing normal files
 Execute (edit an existing normal file):
   edit! fixture/foo
