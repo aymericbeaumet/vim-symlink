@@ -50,6 +50,8 @@ local function resolve_symlink()
       vim.cmd('redraw')
     end
 
+    vim.cmd('edit')
+
     vim.api.nvim_exec_autocmds('User', { pattern = 'SymlinkResolve' })
   end)
 
