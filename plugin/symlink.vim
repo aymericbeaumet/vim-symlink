@@ -51,7 +51,7 @@ function! s:resolve_symlink() abort
       if l:old != -1 && l:old != bufnr('%')
         execute 'silent! bwipeout ' . l:old
       endif
-      filetype detect
+      edit
     endif
 
     if g:symlink_redraw

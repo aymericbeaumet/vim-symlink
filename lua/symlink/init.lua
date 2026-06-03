@@ -43,7 +43,7 @@ local function resolve_symlink()
       if old ~= -1 and old ~= bufnr then
         pcall(vim.api.nvim_buf_delete, old, { force = true })
       end
-      vim.cmd('filetype detect')
+      vim.cmd('edit')
     end
 
     if vim.g.symlink_redraw == 1 then

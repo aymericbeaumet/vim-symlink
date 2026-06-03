@@ -1,0 +1,116 @@
+" Regression tests for previously reported issues / PRs.
+" Each block documents the issue/PR number it covers.
+
+Before:
+  execute 'cd '. fnameescape(fnamemodify(g:vader_file, ':p:h'))
+
+" ------- Issue #22, PR #21 -------
+" Writing a resolved symlink with :w must not fail with `E13: File exists`.
+
+Execute (#22/#21: :w on a resolved symlink succeeds without E13):
+  let g:e13_target = tempname()
+  let g:e13_link = tempname() . '.link'
+  call writefile(['initial'], g:e13_target)
+  call system('ln -s ' . shellescape(g:e13_target) . ' ' . shellescape(g:e13_link))
+  execute 'edit! ' . fnameescape(g:e13_link)
+  call append(line('$'), 'appended')
+  let v:errmsg = ''
+  silent! write
+  let g:e13_errmsg = v:errmsg
+  let g:e13_target_content = readfile(g:e13_target)
+  call delete(g:e13_link)
+  call delete(g:e13_target)
+Then (no E13 and the resolved file received the write):
+  Assert g:e13_errmsg !~# 'E13', 'expected no E13, got: ' . g:e13_errmsg
+  Assert g:e13_errmsg !~# 'E37', 'expected no E37, got: ' . g:e13_errmsg
+  AssertEqual ['initial', 'appended'], g:e13_target_content
+
+" ------- Issue #17 -------
+" :vimgrep across files inside a symlinked directory must not emit
+" `E937: Attempt to delete a buffer that is in use`.
+
+Execute (#17: :vimgrep on a symlinked directory does not raise E937):
+  let g:vg_messages = ''
+  redir => g:vg_messages
+  silent! vimgrep /foo/j fixture/dir.link/*
+  silent! vimgrep /baz/j fixture/dir.link/*
+  redir END
+Then (no E937 from buffer churn):
+  Assert g:vg_messages !~# 'E937', 'expected no E937, got: ' . g:vg_messages
+
+" ------- Issue #14, PR #16 -------
+" Other BufReadPost autocmds (e.g. neovim's editorconfig) must see a valid
+" current buffer after symlink resolution finishes.
+
+Execute (#14: BufReadPost handlers run after resolution see a valid buffer):
+  let g:ec_seen_valid = 0
+  let g:ec_seen_name = ''
+  augroup test_editorconfig_sim
+    autocmd!
+    autocmd BufReadPost * let g:ec_seen_valid = bufexists(bufnr('%'))
+    autocmd BufReadPost * let g:ec_seen_name = bufname('%')
+  augroup END
+  edit! fixture/foo.link
+  augroup test_editorconfig_sim
+    autocmd!
+  augroup END
+Then (the late handler observed a live buffer with the resolved name):
+  AssertEqual 1, g:ec_seen_valid, 'BufReadPost saw an invalid buffer id'
+  Assert g:ec_seen_name =~# 'fixture/foo$', 'expected resolved name, got: ' . g:ec_seen_name
+
+Execute (#14: opening a symlink whose target already has a buffer leaves a valid current buffer):
+  edit! fixture/foo
+  let g:ec2_seen_valid = 0
+  augroup test_editorconfig_sim2
+    autocmd!
+    autocmd BufReadPost * let g:ec2_seen_valid = bufexists(bufnr('%'))
+  augroup END
+  edit! fixture/foo.link
+  augroup test_editorconfig_sim2
+    autocmd!
+  augroup END
+Then (current buffer is still valid even after old buffer wipe):
+  AssertEqual 1, g:ec2_seen_valid, 'BufReadPost saw an invalid buffer after switch + wipe'
+  AssertEqual 'fixture/foo', expand('%:.')
+
+" ------- Issue #13 -------
+" Symlinks opened by relative path (including ones that traverse a directory
+" symlink) must be resolved against the buffer's actual file, not <afile>.
+
+Execute (#13: relative symlink path resolves to its real target):
+  edit! fixture/dir.link/.gitkeep
+Then (the buffer points at the real directory, not the symlinked one):
+  Assert expand('%:.') !~# 'dir\.link', 'expected resolved path, got: ' . expand('%:.')
+  AssertEqual 'fixture/dir/.gitkeep', expand('%:.')
+
+" ------- Issue #6 -------
+" Opening symlinks must never trigger `E218: autocmd nesting too deep`,
+" even for chained symlinks and repeated edits.
+
+Execute (#6: chained and repeated symlink edits do not trigger E218):
+  let v:errmsg = ''
+  edit! fixture/chain.link
+  edit! fixture/foo.link
+  edit! fixture/bar.link
+  edit! fixture/chain.link
+  let g:nest_errmsg = v:errmsg
+Then (no nesting-too-deep error):
+  Assert g:nest_errmsg !~# 'E218', 'expected no E218, got: ' . g:nest_errmsg
+
+" ------- Issue #5 -------
+" After symlink resolution, BufWinEnter must fire with the resolved name so
+" that features like mkview / loadview attach state to the resolved file.
+
+Execute (#5: BufWinEnter after resolve sees the resolved path):
+  let g:bwe_seen = ''
+  augroup test_loadview_sim
+    autocmd!
+    autocmd BufWinEnter * let g:bwe_seen = expand('%:p')
+  augroup END
+  edit! fixture/foo.link
+  augroup test_loadview_sim
+    autocmd!
+  augroup END
+Then (BufWinEnter observed the resolved path, not the symlink):
+  Assert g:bwe_seen !~# 'foo\.link$', 'BufWinEnter still saw the symlink path: ' . g:bwe_seen
+  Assert g:bwe_seen =~# 'fixture/foo$', 'expected resolved path, got: ' . g:bwe_seen
