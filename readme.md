@@ -15,7 +15,7 @@ resolved target path.
 - Allow to create new files in symlinked directories
 - Make [vim-fugitive](https://github.com/tpope/vim-fugitive) behave properly
   with linked files
-- Native Lua implementation for Neovim (0.7+) with VimScript fallback for Vim
+- Native Lua implementation for Neovim with VimScript implementation for Vim
 - No dependencies required
 - Runtime enable/disable via `g:symlink_enabled`
 - `User SymlinkResolve` event for custom hooks

@@ -6,7 +6,7 @@ Before:
 Execute (check implementation loaded):
   Assert exists('g:symlink_loaded'), 'g:symlink_loaded should be set'
   Assert exists('g:symlink_implementation'), 'g:symlink_implementation should be set'
-  if has('nvim-0.7')
+  if has('nvim')
     AssertEqual 'lua', g:symlink_implementation
   else
     AssertEqual 'vim', g:symlink_implementation

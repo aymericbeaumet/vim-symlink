@@ -25,6 +25,27 @@ Then (no E13 and the resolved file received the write):
   Assert g:e13_errmsg !~# 'E37', 'expected no E37, got: ' . g:e13_errmsg
   AssertEqual ['initial', 'appended'], g:e13_target_content
 
+Execute (#22: :w on a file under a resolved symlinked directory succeeds without E13):
+  let g:e13_dir = tempname()
+  let g:e13_real_dir = g:e13_dir . '.real'
+  let g:e13_link_dir = g:e13_dir . '.link'
+  let g:e13_file = g:e13_real_dir . '/init.vim'
+  call mkdir(g:e13_real_dir, 'p')
+  call writefile(['set number'], g:e13_file)
+  call system('ln -s ' . shellescape(g:e13_real_dir) . ' ' . shellescape(g:e13_link_dir))
+  execute 'edit! ' . fnameescape(g:e13_link_dir . '/init.vim')
+  call append(line('$'), 'set relativenumber')
+  let v:errmsg = ''
+  silent! write
+  let g:e13_dir_errmsg = v:errmsg
+  let g:e13_dir_content = readfile(g:e13_file)
+  call delete(g:e13_link_dir)
+  call delete(g:e13_real_dir, 'rf')
+Then (no E13 and the resolved directory target received the write):
+  Assert g:e13_dir_errmsg !~# 'E13', 'expected no E13, got: ' . g:e13_dir_errmsg
+  Assert g:e13_dir_errmsg !~# 'E37', 'expected no E37, got: ' . g:e13_dir_errmsg
+  AssertEqual ['set number', 'set relativenumber'], g:e13_dir_content
+
 " ------- Issue #17 -------
 " :vimgrep across files inside a symlinked directory must not emit
 " `E937: Attempt to delete a buffer that is in use`.
@@ -37,6 +58,33 @@ Execute (#17: :vimgrep on a symlinked directory does not raise E937):
   redir END
 Then (no E937 from buffer churn):
   Assert g:vg_messages !~# 'E937', 'expected no E937, got: ' . g:vg_messages
+
+" ------- Issue #10 -------
+" Users must be able to opt out for selected symlinks without disabling the
+" plugin permanently.
+
+Execute (#10: autocmds can skip selected symlinks and keep following others):
+  let g:symlink_enabled = 1
+  augroup test_selective_symlink_disable
+    autocmd!
+    autocmd BufReadPre */bar.link let g:symlink_enabled = 0
+    autocmd BufReadPost */bar.link let g:symlink_enabled = 1
+  augroup END
+  edit! fixture/bar.link
+  let g:selective_disabled_path = expand('%:.')
+  edit! fixture/foo.link
+  let g:selective_enabled_path = expand('%:.')
+  edit! fixture/baz
+  silent! bwipeout fixture/bar.link
+  silent! bwipeout fixture/foo
+  silent! bwipeout fixture/foo.link
+  augroup test_selective_symlink_disable
+    autocmd!
+  augroup END
+  let g:symlink_enabled = 1
+Then (only the selected symlink remained unresolved):
+  Assert g:selective_disabled_path =~# 'fixture/bar\.link$', 'expected skipped symlink path, got: ' . g:selective_disabled_path
+  AssertEqual 'fixture/foo', g:selective_enabled_path
 
 " ------- Issue #14, PR #16 -------
 " Other BufReadPost autocmds (e.g. neovim's editorconfig) must see a valid
@@ -97,6 +145,31 @@ Execute (#6: chained and repeated symlink edits do not trigger E218):
 Then (no nesting-too-deep error):
   Assert g:nest_errmsg !~# 'E218', 'expected no E218, got: ' . g:nest_errmsg
 
+Execute (#6: help files under a symlinked runtime load without autocmd recursion):
+  let g:help_root = tempname()
+  let g:help_real = g:help_root . '.real'
+  let g:help_link = g:help_root . '.link'
+  call mkdir(g:help_real . '/doc', 'p')
+  call writefile(['*issue6-help-tag*', 'Issue 6 help file'], g:help_real . '/doc/issue6.txt')
+  execute 'helptags ' . fnameescape(g:help_real . '/doc')
+  call system('ln -s ' . shellescape(g:help_real) . ' ' . shellescape(g:help_link))
+  let g:help_rtp_save = &runtimepath
+  let &runtimepath = g:help_link . ',' . &runtimepath
+  let v:errmsg = ''
+  silent! help issue6-help-tag
+  let g:help_errmsg = v:errmsg
+  let g:help_buftype = &buftype
+  let g:help_line = getline(1)
+  bwipeout!
+  let &runtimepath = g:help_rtp_save
+  call delete(g:help_link)
+  call delete(g:help_real, 'rf')
+Then (help opened and no nesting-too-deep error leaked):
+  Assert g:help_errmsg !~# 'E218', 'expected no E218, got: ' . g:help_errmsg
+  Assert g:help_errmsg !~# 'E171', 'expected no E171, got: ' . g:help_errmsg
+  AssertEqual 'help', g:help_buftype
+  AssertEqual '*issue6-help-tag*', g:help_line
+
 " ------- Issue #5 -------
 " After symlink resolution, BufWinEnter must fire with the resolved name so
 " that features like mkview / loadview attach state to the resolved file.
@@ -114,3 +187,36 @@ Execute (#5: BufWinEnter after resolve sees the resolved path):
 Then (BufWinEnter observed the resolved path, not the symlink):
   Assert g:bwe_seen !~# 'foo\.link$', 'BufWinEnter still saw the symlink path: ' . g:bwe_seen
   Assert g:bwe_seen =~# 'fixture/foo$', 'expected resolved path, got: ' . g:bwe_seen
+
+Execute (#5: mkview/loadview restores cursor after resolving a symlink):
+  let g:view_target = tempname()
+  let g:view_link = tempname() . '.link'
+  let g:view_dir = tempname()
+  call mkdir(g:view_dir, 'p')
+  call writefile(['one', 'two', 'three', 'four'], g:view_target)
+  call system('ln -s ' . shellescape(g:view_target) . ' ' . shellescape(g:view_link))
+  let g:viewdir_save = &viewdir
+  let g:viewoptions_save = &viewoptions
+  let &viewdir = g:view_dir
+  set viewoptions=cursor
+  augroup test_loadview_actual
+    autocmd!
+    autocmd BufWinLeave * silent! mkview!
+    autocmd BufWinEnter * silent! loadview
+  augroup END
+  execute 'edit! ' . fnameescape(g:view_link)
+  call cursor(3, 1)
+  edit! fixture/bar
+  execute 'edit! ' . fnameescape(g:view_link)
+  let g:view_restored_line = line('.')
+  augroup test_loadview_actual
+    autocmd!
+  augroup END
+  bwipeout!
+  let &viewdir = g:viewdir_save
+  let &viewoptions = g:viewoptions_save
+  call delete(g:view_link)
+  call delete(g:view_target)
+  call delete(g:view_dir, 'rf')
+Then (the saved cursor position was restored through the resolved path):
+  AssertEqual 3, g:view_restored_line
