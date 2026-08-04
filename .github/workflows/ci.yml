@@ -41,3 +41,34 @@ jobs:
 
       - name: test-nvim
         run: make test-nvim
+
+  compatibility:
+    name: compatibility (${{ matrix.editor }} ${{ matrix.version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - editor: Vim
+            version: v8.2.3995
+            neovim: false
+            target: test-vim
+          - editor: Neovim
+            version: v0.6.1
+            neovim: true
+            target: test-nvim
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: install ${{ matrix.editor }} ${{ matrix.version }}
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: ${{ matrix.neovim }}
+          version: ${{ matrix.version }}
+
+      - name: test ${{ matrix.editor }} ${{ matrix.version }}
+        run: make ${{ matrix.target }}
