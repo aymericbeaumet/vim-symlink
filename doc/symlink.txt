@@ -10,9 +10,9 @@ License: MIT
 Neovim in a cross-platform way. This means that when you edit a pathname that
 is a symlink, vim will instead open the file using the resolved target path.
 
-In Neovim (0.7+), a native Lua implementation is used for better performance.
-In Vim, an equivalent VimScript implementation is used. Both implementations
-share the same features and behavior.
+In Neovim, a native Lua implementation is used. In Vim, an equivalent
+VimScript implementation is used. Both implementations share the same features
+and behavior.
 
                             {1}: https://github.com/aymericbeaumet/vim-symlink
 
