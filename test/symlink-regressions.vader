@@ -46,6 +46,20 @@ Then (no E13 and the resolved directory target received the write):
   Assert g:e13_dir_errmsg !~# 'E37', 'expected no E37, got: ' . g:e13_dir_errmsg
   AssertEqual ['set number', 'set relativenumber'], g:e13_dir_content
 
+Execute (#22: resolving into a fresh buffer detects the target filetype):
+  let g:filetype_target = tempname() . '.vim'
+  let g:filetype_link = tempname() . '.link'
+  call writefile(['set number'], g:filetype_target)
+  call system('ln -s ' . shellescape(g:filetype_target) . ' ' . shellescape(g:filetype_link))
+  execute 'edit! ' . fnameescape(g:filetype_link)
+  let g:resolved_filetype = &filetype
+  let g:resolved_syntax = &syntax
+  call delete(g:filetype_link)
+  call delete(g:filetype_target)
+Then (the resolved target has syntax highlighting metadata):
+  AssertEqual 'vim', g:resolved_filetype
+  AssertEqual 'vim', g:resolved_syntax
+
 " ------- Issue #17 -------
 " :vimgrep across files inside a symlinked directory must not emit
 " `E937: Attempt to delete a buffer that is in use`.

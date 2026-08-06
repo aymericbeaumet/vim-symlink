@@ -38,6 +38,20 @@ local function switch_windows_to_buffer(winids, target)
   restore_window(current)
 end
 
+local function detect_filetype(bufnr, resolved)
+  if vim.fn.getbufvar(bufnr, '&filetype') ~= ''
+      or vim.fn.exists('#filetypedetect#BufRead') == 0 then
+    return
+  end
+
+  -- The buffer was loaded from a non-nested BufReadPost autocmd, so its
+  -- normal filetype detection was skipped. Replay only that autocmd group.
+  vim.cmd(
+    'doautocmd <nomodeline> filetypedetect BufRead '
+      .. vim.fn.fnameescape(resolved)
+  )
+end
+
 local function reopen_nvim_buffer(bufnr, resolved)
   if not buffer_exists(bufnr) then
     return
@@ -56,6 +70,7 @@ local function reopen_nvim_buffer(bufnr, resolved)
   vim.cmd('badd ' .. vim.fn.fnameescape(resolved))
   local target = vim.fn.bufnr(resolved)
   switch_windows_to_buffer(winids, target)
+  detect_filetype(target, resolved)
 
   if buffer_exists(bufnr) and bufnr ~= vim.api.nvim_get_current_buf() then
     delete_buffer(bufnr)
@@ -103,6 +118,7 @@ function M.resolve_symlink()
     local existing = vim.fn.bufnr(resolved)
     if existing ~= -1 and existing ~= bufnr then
       switch_windows_to_buffer(vim.fn.win_findbuf(bufnr), existing)
+      detect_filetype(existing, resolved)
       delete_buffer(bufnr)
     else
       vim.cmd('keepalt file ' .. vim.fn.fnameescape(resolved))

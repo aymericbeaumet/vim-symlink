@@ -23,6 +23,18 @@ function! s:switch_windows_to_buffer(winids, target) abort
   endif
 endfunction
 
+function! s:detect_filetype(bufnr, resolved) abort
+  if !empty(getbufvar(a:bufnr, '&filetype'))
+        \ || !exists('#filetypedetect#BufRead')
+    return
+  endif
+
+  " The buffer was loaded from a non-nested BufReadPost autocmd, so its
+  " normal filetype detection was skipped. Replay only that autocmd group.
+  execute 'doautocmd <nomodeline> filetypedetect BufRead '
+        \ . fnameescape(a:resolved)
+endfunction
+
 function! s:reopen_vim_buffer(bufnr, resolved) abort
   if !bufexists(a:bufnr)
     return
@@ -41,6 +53,7 @@ function! s:reopen_vim_buffer(bufnr, resolved) abort
   execute 'badd ' . fnameescape(a:resolved)
   let l:target = bufnr(a:resolved)
   call s:switch_windows_to_buffer(l:winids, l:target)
+  call s:detect_filetype(l:target, a:resolved)
 
   if bufexists(a:bufnr) && a:bufnr != bufnr('%')
     execute 'silent! bwipeout ' . a:bufnr
@@ -84,6 +97,7 @@ function! s:resolve_symlink() abort
     let l:existing = bufnr(l:resolved)
     if l:existing != -1 && l:existing != l:bufnr
       call s:switch_windows_to_buffer(win_findbuf(l:bufnr), l:existing)
+      call s:detect_filetype(l:existing, l:resolved)
       execute 'silent! bwipeout ' . l:bufnr
     else
       execute 'keepalt file ' . fnameescape(l:resolved)
