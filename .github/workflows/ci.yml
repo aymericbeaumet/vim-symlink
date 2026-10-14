@@ -12,26 +12,13 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
         with:
           submodules: true
 
-      - uses: actions/setup-python@v5
+      - uses: jdx/mise-action@v5.1.2
         with:
-          python-version: '3.11'
-
-      - name: install vim
-        uses: rhysd/action-setup-vim@v1
-        with:
-          neovim: false
-
-      - name: install neovim
-        uses: rhysd/action-setup-vim@v1
-        with:
-          neovim: true
-
-      - name: install linter
-        run: pip install vim-vint==0.3.21
+          version: '2026.10.10'
 
       - name: lint
         run: make lint
@@ -60,12 +47,12 @@ jobs:
             target: test-nvim
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
         with:
           submodules: true
 
       - name: install ${{ matrix.editor }} ${{ matrix.version }}
-        uses: rhysd/action-setup-vim@v1
+        uses: rhysd/action-setup-vim@v1.6.1
         with:
           neovim: ${{ matrix.neovim }}
           version: ${{ matrix.version }}
