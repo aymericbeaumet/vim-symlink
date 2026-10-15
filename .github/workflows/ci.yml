@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-24.04, macos-15]
 
     runs-on: ${{ matrix.os }}
 
@@ -18,7 +18,7 @@ jobs:
 
       - uses: jdx/mise-action@v5.1.2
         with:
-          version: '2026.10.10'
+          version: '2026.10.11'
 
       - name: lint
         run: make lint
@@ -31,7 +31,9 @@ jobs:
 
   compatibility:
     name: compatibility (${{ matrix.editor }} ${{ matrix.version }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    env:
+      MISE_ENV: compat
 
     strategy:
       fail-fast: false
@@ -39,11 +41,11 @@ jobs:
         include:
           - editor: Vim
             version: v8.2.3995
-            neovim: false
+            tool: asdf:mise-plugins/mise-vim
             target: test-vim
           - editor: Neovim
             version: v0.6.1
-            neovim: true
+            tool: aqua:neovim/neovim
             target: test-nvim
 
     steps:
@@ -51,11 +53,10 @@ jobs:
         with:
           submodules: true
 
-      - name: install ${{ matrix.editor }} ${{ matrix.version }}
-        uses: rhysd/action-setup-vim@v1.6.1
+      - uses: jdx/mise-action@v5.1.2
         with:
-          neovim: ${{ matrix.neovim }}
-          version: ${{ matrix.version }}
+          version: '2026.10.11'
+          install_args: ${{ matrix.tool }}
 
       - name: test ${{ matrix.editor }} ${{ matrix.version }}
         run: make ${{ matrix.target }}

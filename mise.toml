@@ -1,7 +1,7 @@
 [tools]
-"asdf:mise-plugins/mise-vim" = "9.2.1186"
-neovim = "0.12.6"
+"asdf:mise-plugins/mise-vim" = "9.2.1202"
+"aqua:neovim/neovim" = "0.12.6"
 python = "3.15.0"
-uv = "0.13.0"
+uv = "0.13.1"
 # Vint still imports pkg_resources, removed in setuptools 82.
 "pipx:vim-vint" = { version = "0.3.21", uvx_args = "--python 3.15.0 --with setuptools==81.0.0" }
