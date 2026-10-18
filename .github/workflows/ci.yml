@@ -1,37 +1,36 @@
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
 
 name: ci
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci:
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-24.04, macos-15]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: true
+          persist-credentials: false
 
-      - uses: actions/setup-python@v5
+      - uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
         with:
-          python-version: '3.11'
-
-      - name: install vim
-        uses: rhysd/action-setup-vim@v1
-        with:
-          neovim: false
-
-      - name: install neovim
-        uses: rhysd/action-setup-vim@v1
-        with:
-          neovim: true
-
-      - name: install linter
-        run: pip install vim-vint==0.3.21
+          version: '2026.10.13'
 
       - name: lint
         run: make lint
@@ -44,7 +43,10 @@ jobs:
 
   compatibility:
     name: compatibility (${{ matrix.editor }} ${{ matrix.version }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      MISE_ENV: compat
 
     strategy:
       fail-fast: false
@@ -52,23 +54,23 @@ jobs:
         include:
           - editor: Vim
             version: v8.2.3995
-            neovim: false
+            tool: asdf:mise-plugins/mise-vim
             target: test-vim
           - editor: Neovim
             version: v0.6.1
-            neovim: true
+            tool: aqua:neovim/neovim
             target: test-nvim
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: true
+          persist-credentials: false
 
-      - name: install ${{ matrix.editor }} ${{ matrix.version }}
-        uses: rhysd/action-setup-vim@v1
+      - uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
         with:
-          neovim: ${{ matrix.neovim }}
-          version: ${{ matrix.version }}
+          version: '2026.10.13'
+          install_args: ${{ matrix.tool }}
 
       - name: test ${{ matrix.editor }} ${{ matrix.version }}
         run: make ${{ matrix.target }}

@@ -6,8 +6,13 @@ VINT ?= vint
 all: lint test
 
 .PHONY: lint
-lint:
+lint: lint-config
 	$(VINT) plugin
+
+.PHONY: lint-config
+lint-config:
+	jactionlint .github/workflows/*.yml
+	taplo check --no-auto-config mise.toml mise.compat.toml
 
 .PHONY: test
 test: test-vim test-nvim
