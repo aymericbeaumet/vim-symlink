@@ -1,9 +1,20 @@
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
 
 name: ci
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci:
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -12,13 +23,14 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: true
+          persist-credentials: false
 
-      - uses: jdx/mise-action@v5.1.2
+      - uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
         with:
-          version: '2026.10.11'
+          version: '2026.10.13'
 
       - name: lint
         run: make lint
@@ -32,6 +44,7 @@ jobs:
   compatibility:
     name: compatibility (${{ matrix.editor }} ${{ matrix.version }})
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     env:
       MISE_ENV: compat
 
@@ -49,13 +62,14 @@ jobs:
             target: test-nvim
 
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: true
+          persist-credentials: false
 
-      - uses: jdx/mise-action@v5.1.2
+      - uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
         with:
-          version: '2026.10.11'
+          version: '2026.10.13'
           install_args: ${{ matrix.tool }}
 
       - name: test ${{ matrix.editor }} ${{ matrix.version }}

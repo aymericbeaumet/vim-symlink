@@ -1,0 +1,5 @@
+[project]
+name = "mise-pypi-tool-environment"
+version = "0.0.0"
+requires-python = "==3.14.8"
+dependencies = ["vim-vint==0.3.21", "setuptools==81.0.0"]
