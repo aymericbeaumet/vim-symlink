@@ -28,9 +28,10 @@ jobs:
           submodules: true
           persist-credentials: false
 
-      - uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
         with:
-          version: '2026.10.13'
+          version: '2026.11.6'
+          install_args: --locked
 
       - name: lint
         run: make lint
@@ -67,10 +68,10 @@ jobs:
           submodules: true
           persist-credentials: false
 
-      - uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
         with:
-          version: '2026.10.13'
-          install_args: ${{ matrix.tool }}
+          version: '2026.11.6'
+          install_args: --locked ${{ matrix.tool }}
 
       - name: test ${{ matrix.editor }} ${{ matrix.version }}
         run: make ${{ matrix.target }}

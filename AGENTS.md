@@ -1,15 +1,13 @@
 # Development
 
-- Initialize test helpers with `git submodule update --init --recursive`.
-- Install the pinned tools with `mise install --locked` and the eight explicit
-  project tools from `mise.toml`; run `mise exec -- make all` for configuration
-  and VimScript linting and the Vim and Neovim suites. Explicit tool arguments
-  avoid pulling unrelated global mise tools into the project's locked install.
-- Keep development tool versions in `mise.toml` and refresh `mise.lock` for
-  Linux and macOS when changing them. Commit the `.mise/locks/` sidecar with
-  `mise.lock`, including `uv.lock` if a global ignore rule hides it. CI uses
-  the same configuration.
-- Preserve the legacy editor versions in the CI compatibility matrix: they
-  intentionally cover Vim 8.2 and Neovim 0.6 regressions. Their pins live in
-  `mise.compat.toml` and `mise.compat.lock`.
-- See `docs/development.md` for dependency maintenance and test details.
+- Use mise 2026.11.6+ and the explicit locked install in `docs/development.md`;
+  initialize test helpers with `git submodule update --init --recursive`.
+- Run `mise run check` for configuration/VimScript lint and both editor suites.
+- Keep exact tools, full Action SHAs, and the Vim build-plugin commit pinned.
+  Refresh `mise.lock` for Linux x64 and macOS arm64/x64 and commit `.mise/locks/`
+  sidecars, including `uv.lock` if globally ignored. A successful `mise lock`
+  can warn and omit Vint's dependency graph; verify its `uv` sidecar reference.
+- Preserve Vim 8.2 and Neovim 0.6 in `mise.compat.toml`/`mise.compat.lock`;
+  these intentionally test legacy regressions on Linux.
+- Keep Vim's explicit build options independent of host language runtimes.
+- See `docs/development.md` for setup, compatibility constraints, and updates.

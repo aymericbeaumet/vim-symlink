@@ -1,10 +1,31 @@
+min_version = "2026.11.6"
+
+[tool_config]
+locked = true
+
 [tools]
-"aqua:jdx/mise" = "2026.10.13"
-"asdf:mise-plugins/mise-vim" = "9.2.1202"
-"github:jdx/jactionlint" = "2.2.0"
+"aqua:jdx/mise" = "2026.11.6"
+"asdf:mise-plugins/mise-vim" = "9.2.1320"
+"github:jdx/jactionlint" = "2.5.0"
 "aqua:neovim/neovim" = "0.12.6"
-python = "3.14.8"
-uv = "0.13.1"
+python = "3.14.10"
+uv = "0.13.7"
 # Vint still imports pkg_resources, removed in setuptools 82.
-"pipx:vim-vint" = { version = "0.3.21", python = "3.14.8", with = ["setuptools==81.0.0"] }
+"pipx:vim-vint" = { version = "0.3.21", python = "3.14.10", with = ["setuptools==81.0.0"] }
 taplo = "0.10.0"
+
+[plugins]
+"asdf-mise-plugins-mise-vim" = "https://github.com/mise-plugins/mise-vim.git#cd917b0f45d69de3a57174964dbf0a405de193d1"
+
+[env]
+# The plugin needs no embedded language runtimes or GUI libraries.
+ASDF_VIM_CONFIG = "--with-tlib=ncurses --enable-multibyte --enable-cscope --enable-terminal --enable-gui=no --without-x --disable-perlinterp --disable-rubyinterp --disable-python3interp --disable-luainterp"
+ASDF_VIM_TYPE = "huge"
+
+[tasks.check]
+description = "Lint configuration and run both editor suites"
+run = "make all"
+
+[tasks.test]
+description = "Run both editor suites"
+run = "make test"
