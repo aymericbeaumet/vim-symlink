@@ -1,4 +1,4 @@
-*symlink.txt*  Automagically follow symlinks
+*symlink.txt* *symlink*  Follow symlinks to their real file paths
 
 Author:  Aymeric Beaumet <hi@aymericbeaumet.com> (https://aymericbeaumet.com)
 License: MIT
@@ -6,13 +6,27 @@ License: MIT
 ==============================================================================
 1. Introduction                                           *symlink-introduction*
 
-{vim-symlink}{1} enables to automatically follow the symlinks in Vim and
-Neovim in a cross-platform way. This means that when you edit a pathname that
-is a symlink, vim will instead open the file using the resolved target path.
+{vim-symlink}{1} automatically follows symlinks in Vim and Neovim. When you
+open a symlink, the buffer uses the resolved target path. This lets plugins
+such as vim-fugitive discover the target's Git repository. The symlink stays
+in place, and your working directory does not change.
 
 In Neovim, a native Lua implementation is used. In Vim, an equivalent
 VimScript implementation is used. Both implementations share the same features
 and behavior.
+
+The plugin loads automatically at startup; no setup call is needed. Plugin
+managers should load it eagerly so it can handle the first file you open.
+
+Resolution runs on |BufReadPost| for readable, normal file buffers. Chained
+symlinks and files inside symlinked directories are supported. If the target
+already has a buffer, that buffer is reused, preserving its unsaved edits.
+Splits, tabs, read-only mode, and diff mode are supported.
+
+Special buffers and unreadable or broken links are left to the editor. New
+files in symlinked directories retain the editor's normal behavior. Resolving
+a link changes the buffer's path; disable the plugin before opening a file
+if your workflow needs the link's name or location.
 
                             {1}: https://github.com/aymericbeaumet/vim-symlink
 
@@ -24,7 +38,8 @@ You can configure this plugin through the following global variables.
 ------------------------------------------------------------------------------
 *g:symlink_loaded*
 
-If set, turn off the script.
+Set this before plugin loading to prevent the plugin from loading. The
+presence of the variable is checked, regardless of its value.
 >
     let g:symlink_loaded = 1
 <
@@ -32,11 +47,13 @@ If set, turn off the script.
 ------------------------------------------------------------------------------
 *g:symlink_enabled*
 
-Allows to enable/disable symlink resolution at runtime. Set to 0 to
-temporarily disable the plugin without unloading it:
+Defaults to 1. Set to 0 to disable resolution for subsequent file reads
+without unloading the plugin. Set to 1 to enable it again. This does not
+rename buffers that have already been resolved:
 >
     let g:symlink_enabled = 0
 <
+In Lua, use vim.g.symlink_enabled = 0.
 
 ------------------------------------------------------------------------------
 *g:symlink_redraw*
