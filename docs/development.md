@@ -1,7 +1,7 @@
 # Development and dependencies
 
 The plugin has no runtime dependencies. Development uses mise exclusively to
-install the editors and lint tools. Start with mise 2026.11.6 or newer, Git,
+install the editors and lint tools. Start with mise 2026.11.12 or newer, Git,
 and the host build prerequisites: a C compiler, Make, and ncurses headers
 (on macOS, the Xcode Command Line Tools). These OS components remain host
 prerequisites; no Homebrew, pip, or separate version-manager setup is needed.
@@ -37,10 +37,8 @@ toolchain, not a claim of bit-for-bit identical Vim binaries across machines.
 CI fixes the runner release to Ubuntu 24.04 and macOS 15.
 
 Vint 0.3.21 still imports `pkg_resources`, removed in setuptools 82, so its
-isolated environment pins setuptools 81.0.0. Python 3.14.10 is the newest
-3.14 patch; Python 3.15.2 cannot resolve the locked graph because PyYAML has
-no compatible wheels. Keep these compatibility constraints until upstream
-supports upgrading them.
+isolated environment pins setuptools 81.0.0. The lock includes PyYAML wheels
+for Python 3.15 on all three supported platforms.
 
 ## Compatibility coverage
 
@@ -64,7 +62,7 @@ workflow's bootstrap version.
 After editing tool pins, refresh locks before installing in locked mode:
 
 ```sh
-mise lock python uv
+mise lock --bump python uv
 mise install --locked python uv
 mise exec python uv -- mise lock --bump --platform linux-x64,macos-arm64,macos-x64
 mise lock -E compat --platform linux-x64
@@ -74,5 +72,5 @@ The pinned Python must be available to resolve Vint's wheel-only dependency
 graph. Check lock output for warnings: a successful command can still fall
 back to a version-only Vint entry when graph resolution fails. Require the
 `uv` sidecar reference in Vint's lock entry before committing. Commit both
-lockfiles and `.mise/locks/`, including `uv.lock` if a global ignore hides it.
+lockfiles and their `.mise/locks/` sidecars.
 Re-run the installation and checks above; CI also runs both legacy editors.

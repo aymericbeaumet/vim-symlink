@@ -1,6 +1,6 @@
 # vim-symlink [![GitHub Actions](https://github.com/aymericbeaumet/vim-symlink/actions/workflows/ci.yml/badge.svg)](https://github.com/aymericbeaumet/vim-symlink/actions/workflows/ci.yml)
 
-**Open a symlink. Edit the real file.**
+**Open a symlink and edit its target by its real path.**
 
 Keep your dotfiles wherever you like. vim-symlink makes Vim and Neovim use
 the target's path when you open a symlink, so plugins such as
@@ -17,10 +17,34 @@ Vim already reads and writes through symlinks. This plugin also gives the
 buffer the real path. It leaves the symlink in place and does not change your
 working directory.
 
-[![demo](./media/demo.gif)](./media/demo.gif)
+[![Vim opening a symlink and showing its target path](./media/demo.gif)](./media/demo.gif)
 
 No configuration or runtime dependencies. Native Lua for Neovim, VimScript
 for Vim. Tested on Linux and macOS, including Vim 8.2 and Neovim 0.6 on Linux.
+
+## Try it without changing your config
+
+This macOS and Linux demo puts a link outside its target's Git repository.
+In a terminal, run
+
+```sh
+demo_dir="$(mktemp -d)"
+cd "$demo_dir"
+git clone --depth 1 https://github.com/aymericbeaumet/vim-symlink.git
+ln -s vim-symlink/readme.md notes.md
+nvim -N -u NONE --cmd 'set runtimepath=./vim-symlink,$VIMRUNTIME' \
+  --cmd 'runtime! plugin/symlink*.vim' notes.md
+```
+
+Use `vim` in place of `nvim` to try Vim. Try these commands in either editor.
+
+| Run | What you see |
+| --- | --- |
+| `:echo expand('%:.')` | `vim-symlink/readme.md`, the tracked file you opened through `notes.md` |
+| `:!git -C %:h log -1 --oneline` | The latest commit in the target's repository |
+| `:pwd` | The temporary directory where you opened the link |
+
+Quit with `:q`.
 
 ## Install
 
@@ -48,23 +72,6 @@ git clone https://github.com/aymericbeaumet/vim-symlink.git \
 
 For Neovim, use `${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/pack/plugins/start/vim-symlink`
 as the destination instead.
-
-## Try it without changing your config
-
-On macOS or Linux, clone into a temporary directory and open the included
-symlink with only this plugin loaded:
-
-```sh
-demo_dir="$(mktemp -d)"
-git clone --depth 1 https://github.com/aymericbeaumet/vim-symlink.git "$demo_dir/vim-symlink"
-cd "$demo_dir/vim-symlink"
-nvim -N -u NONE --cmd 'set runtimepath+=.' \
-  --cmd 'runtime! plugin/symlink*.vim' test/fixture/foo.link
-```
-
-Replace `nvim` with `vim` to try Vim. Run `:echo expand('%:p')`: the path ends
-in `test/fixture/foo`, and `:echo resolve('test/fixture/foo.link')` still points
-to the same file. Quit with `:q`.
 
 ## Behavior
 
