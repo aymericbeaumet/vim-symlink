@@ -2,4 +2,4 @@
 name = "mise-pypi-tool-environment"
 version = "0.0.0"
 requires-python = "==3.15.2"
-dependencies = ["vim-vint==0.3.21", "setuptools==81.0.0"]
+dependencies = ["vim-vint==0.3.21", "setuptools==84.1.0"]
